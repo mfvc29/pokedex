@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Pokédex para Esmeralda, Rojo Fuego, Verde Hoja, HeartGold, SoulSilver, Platino, Negro/Blanco 1 y 2, X/Y, Rubí Omega/Zafiro Alfa, Ultrasol/Ultraluna, Let's Go, Espada, Arceus, Escarlata y Z-A.">
+<meta name="theme-color" content="#B81F33">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pokédex">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>:root{color-scheme:light}html{-webkit-text-size-adjust:100%}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Pokédex Multijuego</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Figtree:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --dex:#D3263A; --dex-deep:#9E1426; --dex-ink:#FFFFFF; --dex-soft:rgba(255,255,255,.16);
+  --bg:#F2F4F7; --surface:#FFFFFF; --surface-2:#E8ECF1; --ink:#14181D; --muted:#5B6570; --line:#DCE1E7;
+  --accent:#1F6FEB; --good:#1E8E4E; --warn:#B4500F;
+  --shadow:0 1px 0 rgba(20,24,29,.05),0 10px 26px -18px rgba(20,24,29,.45);
+  --f-display:"Chakra Petch",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Figtree",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --dex:#B81F33; --dex-deep:#7E0F1E; --dex-soft:rgba(255,255,255,.12);
+    --bg:#0F1216; --surface:#181C22; --surface-2:#222831; --ink:#E7EBF0; --muted:#97A2AE; --line:#2B323C;
+    --accent:#6EA8FF; --good:#4CC27E; --warn:#F0A060;
+    --shadow:0 1px 0 rgba(0,0,0,.3),0 12px 28px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --dex:#B81F33; --dex-deep:#7E0F1E; --dex-soft:rgba(255,255,255,.12);
+  --bg:#0F1216; --surface:#181C22; --surface-2:#222831; --ink:#E7EBF0; --muted:#97A2AE; --line:#2B323C;
+  --accent:#6EA8FF; --good:#4CC27E; --warn:#F0A060;
+  --shadow:0 1px 0 rgba(0,0,0,.3),0 12px 28px -18px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font:400 15px/1.45 var(--f-body);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.num{font-family:var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+
+/* ---------- top bar (the red Pokédex lid) ---------- */
+.bar{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--dex),var(--dex-deep));color:var(--dex-ink);
+  padding:calc(10px + env(safe-area-inset-top,0px)) 16px 12px;display:flex;flex-direction:column;gap:10px;box-shadow:0 6px 18px -12px rgba(0,0,0,.6)}
+.barrow{display:flex;align-items:center;gap:10px;max-width:760px;width:100%;margin:0 auto}
+.lens{flex:none;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#BFE7FF 0 18%,#3AA0E8 19% 55%,#14598F 56%);box-shadow:0 0 0 3px #fff,0 0 0 4px rgba(0,0,0,.25)}
+.gamebtn{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:8px;border:0;background:var(--dex-soft);border-radius:12px;padding:6px 12px;text-align:left;min-height:46px}
+.gamebtn small{display:block;font:700 10.5px/1 var(--f-body);letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+.gamebtn b{display:block;font:700 18px/1.15 var(--f-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gamebtn svg{flex:none;width:18px;height:18px}
+.tabs{display:flex;gap:4px;background:rgba(0,0,0,.18);border-radius:999px;padding:3px;max-width:760px;width:100%;margin:0 auto}
+.tabs button{flex:1;border:0;background:transparent;color:inherit;border-radius:999px;padding:7px 10px;font-weight:700;font-size:14px;opacity:.85}
+.tabs button[aria-selected="true"]{background:#fff;color:var(--dex-deep);opacity:1}
+.field{position:relative;max-width:760px;width:100%;margin:0 auto}
+.field svg{position:absolute;left:13px;top:50%;width:18px;height:18px;margin-top:-9px;color:var(--muted);pointer-events:none}
+#q{width:100%;border:0;background:var(--surface);color:var(--ink);border-radius:12px;padding:12px 40px 12px 40px;font-size:16px;font-weight:600;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+#q::placeholder{color:var(--muted);font-weight:500}
+#clear{position:absolute;right:6px;top:50%;margin-top:-16px;width:32px;height:32px;border:0;border-radius:50%;background:var(--surface-2);color:var(--muted);font-weight:800}
+
+main{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:12px 40px}
+.meta{color:var(--muted);font-size:13px;margin:2px 2px 10px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.meta b{color:var(--ink)}
+
+/* ---------- list ---------- */
+#list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.sec{font:700 12px/1 var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:14px 4px 4px}
+.row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:6px 12px 6px 6px;text-align:left}
+.row:active{transform:scale(.99)}
+.rnum{font-size:13px;color:var(--muted);min-width:3.2em}
+.rname{font-weight:800;font-size:16px;line-height:1.2}
+.rname small{display:block;font-weight:500;font-size:12.5px;color:var(--muted)}
+.chips{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.t{display:inline-block;border-radius:6px;padding:3px 7px;font:700 11.5px/1.1 var(--f-body);letter-spacing:.02em;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.25);white-space:nowrap}
+.t.dark{color:#1b1b1b;text-shadow:none}
+.thumb{flex:none;display:block;width:var(--ts,56px);height:var(--ts,56px);border-radius:12px;background-color:var(--surface-2);background-repeat:no-repeat;
+  background-size:calc(var(--ts,56px) * 16) calc(var(--ts,56px) * 16);background-position:calc(var(--ts,56px) * var(--cx) * -1) calc(var(--ts,56px) * var(--cy) * -1)}
+.empty{padding:28px 12px;text-align:center;color:var(--muted)}
+.empty strong{display:block;color:var(--ink);font:600 18px/1.3 var(--f-display);margin-bottom:4px}
+.retry{margin-top:10px;border:0;background:var(--dex);color:#fff;border-radius:10px;padding:9px 16px;font-weight:800}
+
+/* ---------- sheets (detail + game picker) ---------- */
+.sheet{position:fixed;inset:0;z-index:30;background:var(--bg);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.shbar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:8px;background:var(--bg);padding:calc(8px + env(safe-area-inset-top,0px)) 12px 8px;border-bottom:1px solid var(--line)}
+.back{border:0;background:var(--surface-2);border-radius:10px;padding:8px 12px;font-weight:800;min-height:40px;display:flex;align-items:center;gap:4px}
+.shbar h2{margin:0;font:700 17px/1.2 var(--f-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shbody{max-width:760px;margin:0 auto;padding:14px 16px calc(40px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.hero{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:var(--shadow)}
+.hero .thumb{--ts:132px;border-radius:16px;background-color:var(--surface-2)}
+.hname{font:700 26px/1.1 var(--f-display);margin:0;text-wrap:balance}
+.hsub{color:var(--muted);font-size:13.5px;margin:2px 0 8px}
+.badge{display:inline-block;border-radius:6px;padding:3px 7px;font:700 11px/1.1 var(--f-body);background:var(--surface-2);color:var(--muted);margin-left:4px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.card h3{margin:0;font:700 16px/1.2 var(--f-display);letter-spacing:.01em}
+.card h3 small{font:600 12.5px/1 var(--f-body);color:var(--muted);margin-left:6px}
+.note{color:var(--muted);font-size:13px;margin:0}
+
+/* evolution tree */
+.evo{display:flex;flex-direction:column;gap:6px}
+.enode{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:5px 10px 5px 5px;width:100%;text-align:left}
+.enode .thumb{--ts:48px;background-color:var(--surface)}
+.enode b{font-weight:800}
+.enode.cur{border-color:var(--dex);box-shadow:inset 0 0 0 1px var(--dex)}
+.ehow{display:flex;align-items:flex-start;gap:8px;color:var(--ink);font-size:13.5px;padding:2px 0 2px 22px}
+.ehow::before{content:"";flex:none;width:2px;align-self:stretch;background:var(--line);margin-right:6px;border-radius:2px}
+.ehow span{background:var(--surface-2);border-radius:8px;padding:4px 9px;font-weight:600}
+.ekids{display:flex;flex-direction:column;gap:6px}
+.ekids.branch{padding-left:14px;border-left:2px dashed var(--line);margin-left:22px}
+
+/* location */
+.where{display:flex;flex-direction:column;gap:8px}
+.wrow{font-size:14.5px;line-height:1.5}
+.lbl{display:inline-block;font:700 10.5px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;background:var(--surface-2);color:var(--muted);border-radius:5px;padding:3px 6px;margin-right:6px;vertical-align:2px}
+.enc{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.enc li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.enc .p{font-weight:700}
+.enc .m{grid-column:1;color:var(--muted);font-size:13px}
+.enc .lv{grid-row:1 / span 2;grid-column:2;text-align:right;font-size:13px;color:var(--muted);align-self:center}
+.enc .lv b{display:block;color:var(--ink);font-size:15px}
+.more{align-self:flex-start;border:1px solid var(--line);background:transparent;border-radius:10px;padding:7px 12px;font-weight:700;font-size:13.5px;color:var(--accent)}
+
+/* weaknesses */
+.wk{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 10px;align-items:center}
+.wk .x{font:700 13px/1 var(--f-display);color:var(--muted);text-align:right}
+.wk .x.hot{color:var(--dex)}
+
+/* game picker */
+.gplat{font:700 12px/1 var(--f-body);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:6px 4px 0}
+.glist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:8px}
+.gopt{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 14px;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:54px}
+.gopt b{font:700 16px/1.2 var(--f-display)}
+.gopt small{color:var(--muted);font-size:12px;font-weight:600}
+.gopt[aria-current="true"]{border-color:var(--dex);background:color-mix(in srgb,var(--dex) 9%,var(--surface))}
+
+/* contests */
+.ctabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.ctabs::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-weight:700;font-size:13.5px;display:inline-flex;align-items:center;gap:6px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.flist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.frow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;align-items:start}
+.frow .dot{width:14px;height:14px;margin-top:3px}
+.frow b{font-weight:800}
+.frow span{color:var(--muted);font-size:13px}
+.berries{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.berry{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px}
+.berry b{font-weight:800;font-size:15.5px}
+.berry .res{grid-column:2;grid-row:1;font-size:12.5px;font-weight:700;color:var(--muted);text-align:right}
+.bars{grid-column:1 / -1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.bar5{display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted);font-weight:600}
+.bar5 i{display:block;height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden}
+.bar5 i::after{content:"";display:block;height:100%;width:var(--w);background:var(--c)}
+.bmeta{grid-column:1 / -1;font-size:12.5px;color:var(--muted)}
+.ribbons{display:flex;flex-direction:column;gap:10px}
+.rcat{display:flex;flex-direction:column;gap:6px}
+.rcat > b{display:flex;align-items:center;gap:8px;font-weight:800}
+.rgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.rib{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:8px 4px;font-size:12px;font-weight:700;text-align:center;min-height:62px;justify-content:center}
+.rib input{position:absolute;opacity:0;pointer-events:none}
+.rib .ico{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;color:transparent}
+.rib.on{border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,var(--surface))}
+.rib.on .ico{background:var(--good);border-color:var(--good);color:#fff}
+.src{font-size:12.5px;color:var(--muted);text-align:center;padding-top:8px}
+.src a{color:var(--accent);font-weight:700}
+@media (max-width:420px){
+  .hero{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .hero .chips{justify-content:center}
+  .rname{font-size:15.5px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="barrow">
+    <span class="lens" aria-hidden="true"></span>
+    <button type="button" class="gamebtn" id="gameBtn" aria-haspopup="dialog">
+      <span><small>Juego</small><b id="gameName">Cargando…</b></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+  </div>
+  <div class="tabs" role="tablist" id="tabs" hidden>
+    <button type="button" role="tab" data-tab="dex" aria-selected="true">Pokédex</button>
+    <button type="button" role="tab" data-tab="contest" aria-selected="false">Concursos</button>
+  </div>
+  <div class="field" id="searchBox">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="Nombre o número" aria-label="Buscar Pokémon por nombre o número">
+    <button type="button" id="clear" aria-label="Borrar búsqueda" hidden>×</button>
+  </div>
+</header>
+
+<main>
+  <section id="viewDex">
+    <div class="meta"><span id="count"></span><span id="dexNote"></span></div>
+    <ul id="list"><li class="empty"><strong>Cargando Pokédex…</strong></li></ul>
+    <div id="sentinel" aria-hidden="true" style="height:1px"></div>
+  </section>
+  <section id="viewContest" hidden></section>
+  <p class="src">Datos: <a href="https://pokeapi.co" target="_blank" rel="noopener">PokéAPI</a>, <a href="https://bulbapedia.bulbagarden.net" target="_blank" rel="noopener">Bulbapedia</a> y <a href="https://github.com/kwsch/PKHeX" target="_blank" rel="noopener">PKHeX</a>. Pokémon es una marca de Nintendo, Creatures y GAME FREAK.</p>
+</main>
+
+<div class="sheet" id="detail" role="dialog" aria-modal="true" aria-labelledby="dTitle" hidden>
+  <div class="shbar"><button type="button" class="back" data-close="detail" aria-label="Volver a la lista"><span aria-hidden="true">‹</span> Volver</button><h2 id="dTitle"></h2></div>
+  <div class="shbody" id="dBody"></div>
+</div>
+<div class="sheet" id="picker" role="dialog" aria-modal="true" aria-labelledby="pTitle" hidden>
+  <div class="shbar"><button type="button" class="back" data-close="picker" aria-label="Cerrar"><span aria-hidden="true">‹</span> Volver</button><h2 id="pTitle">Elige tu juego</h2></div>
+  <div class="shbody" id="pBody"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9♀♂]+/g,' ').trim();
+const store = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+const TYPE_COLOR = {1:'#A8A77A',2:'#C22E28',3:'#A98FF3',4:'#A33EA1',5:'#E2BF65',6:'#B6A136',7:'#A6B91A',8:'#735797',9:'#B7B7CE',10:'#EE8130',11:'#6390F0',12:'#7AC74C',13:'#F7D02C',14:'#F95587',15:'#96D9D6',16:'#6F35FC',17:'#705746',18:'#D685AD'};
+const TYPE_DARK_TEXT = new Set([1,5,6,9,13,15,12,7]);
+const PLATFORM = {emerald:'Game Boy Advance',firered:'Game Boy Advance',leafgreen:'Game Boy Advance',platinum:'Nintendo DS',heartgold:'Nintendo DS',soulsilver:'Nintendo DS',
+  black:'Nintendo DS',white:'Nintendo DS','black-2':'Nintendo DS','white-2':'Nintendo DS',x:'Nintendo 3DS',y:'Nintendo 3DS','omega-ruby':'Nintendo 3DS','alpha-sapphire':'Nintendo 3DS',
+  'ultra-sun':'Nintendo 3DS','ultra-moon':'Nintendo 3DS','lets-go-pikachu':'Nintendo Switch',sword:'Nintendo Switch','legends-arceus':'Nintendo Switch',scarlet:'Nintendo Switch','legends-za':'Nintendo Switch'};
+const FLAV_COLOR = ['#E5484D','#3B82F6','#EC6FB0','#22A35A','#E9B308'];
+const BLOCK_COLOR = ['Rojo','Azul','Rosa','Verde','Amarillo'];
+
+// The phone's Back button closes the open sheet
+function pushSheet(name){ try { history.pushState({sheet:name}, ''); } catch(e){} }
+let CORE = null, BER = null, G = null, game = null;
+const gameCache = {};
+const state = { q:'', limit:80, tab:'dex', sid:null, berryFlavor:-1 };
+
+/* ---------- helpers ---------- */
+function thumb(sid, cls){
+  const i = sid - 1, sheet = i >> 8, pos = i & 255;
+  return `<span class="thumb${cls ? ' ' + cls : ''}" role="img" aria-label="${esc(sp(sid).es)}" style="--cx:${pos % 16};--cy:${pos >> 4};background-image:url(s/${sheet}.webp)"></span>`;
+}
+function sp(sid){ const r = CORE.sp[sid]; return r ? {es:r[0], en:r[1], gen:r[2], chain:r[3], frm:r[4], types:r[5], past:r[6], leg:r[7]} : null; }
+function typesFor(sid){
+  const s = sp(sid);
+  for (const [g, t] of s.past) if (game.gen <= g) return t;
+  return s.types;
+}
+function chip(t){ return `<span class="t${TYPE_DARK_TEXT.has(t) ? ' dark' : ''}" style="background:${TYPE_COLOR[t]}">${esc(CORE.types[t][1])}</span>`; }
+function pad(n){ return String(n).padStart(3, '0'); }
+
+/* ---------- data loading ---------- */
+async function getJSON(url){
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(r.status + ' ' + url);
+  return r.json();
+}
+async function loadGame(k){
+  game = CORE.games.find(g => g.k === k) || CORE.games.find(g => g.k === 'alpha-sapphire') || CORE.games[0];
+  store.set('pk-game', game.k);
+  $('gameName').textContent = game.n;
+  $('tabs').hidden = !game.contest;
+  if (!game.contest && state.tab === 'contest') setTab('dex');
+  $('list').innerHTML = '<li class="empty"><strong>Cargando Pokédex…</strong></li>';
+  try {
+    G = gameCache[game.k] || (gameCache[game.k] = await getJSON(`g/${game.k}.json`));
+  } catch(e){
+    $('list').innerHTML = `<li class="empty"><strong>No se pudo cargar ${esc(game.n)}</strong>Revisa tu conexión.<br><button type="button" class="retry" id="retry">Reintentar</button></li>`;
+    return;
+  }
+  G.existsSet = new Set(G.exists);
+  G.inDex = new Map();
+  G.dex.forEach(([di, num, sid]) => { if (!G.inDex.has(sid)) G.inDex.set(sid, []); G.inDex.get(sid).push([di, num]); });
+  state.limit = 80;
+  renderList();
+  if (state.tab === 'contest') renderContest();
+}
+
+/* ---------- list ---------- */
+function matches(sid, q, qn){
+  const s = sp(sid);
+  if (!q) return true;
+  if (/^\d+$/.test(q)) {
+    const n = +q;
+    return sid === n || (G.inDex.get(sid) || []).some(([, num]) => num === n);
+  }
+  const a = norm(s.es), b = norm(s.en);
+  return a.includes(qn) || b.includes(qn);
+}
+function rowHtml(sid, di, num){
+  const s = sp(sid);
+  const label = num != null ? `#${pad(num)}` : `Nº ${pad(sid)}`;
+  return `<li><button type="button" class="row" data-sid="${sid}">
+    ${thumb(sid)}
+    <span><span class="num rnum">${label}</span><span class="rname">${esc(s.es)}${norm(s.en) !== norm(s.es) ? `<small>${esc(s.en)}</small>` : ''}</span></span>
+    <span class="chips">${typesFor(sid).map(chip).join('')}</span>
+  </button></li>`;
+}
+function renderList(){
+  if (!G) return;
+  const q = state.q.trim(), qn = norm(q);
+  let items = [];
+  const seen = new Set();
+  let lastDi = -1;
+  for (const [di, num, sid] of G.dex){
+    if (q && seen.has(sid)) continue;
+    if (!matches(sid, q, qn)) continue;
+    seen.add(sid);
+    if (game.dex.length > 1 && di !== lastDi && !q){ items.push({sec: game.dex[di]}); lastDi = di; }
+    items.push({sid, di, num});
+  }
+  const dexCount = items.filter(x => x.sid).length;
+  if (q){
+    const extra = G.exists.filter(sid => !seen.has(sid) && matches(sid, q, qn));
+    if (extra.length){ items.push({sec: 'Fuera de la Pokédex regional'}); extra.forEach(sid => items.push({sid, num: null})); }
+  }
+  const total = items.filter(x => x.sid).length;
+  $('count').innerHTML = q ? `<b>${total}</b> ${total === 1 ? 'resultado' : 'resultados'}` : `<b>${dexCount}</b> Pokémon en la Pokédex de ${esc(game.dex.join(' + '))}`;
+  $('dexNote').textContent = q ? '' : `${G.exists.length} en total en el juego`;
+  if (!total){
+    $('list').innerHTML = `<li class="empty"><strong>Sin resultados para “${esc(q)}”</strong>Busca por nombre en español o inglés, o por número.</li>`;
+    return;
+  }
+  let shown = 0, html = '';
+  for (const it of items){
+    if (shown >= state.limit) break;
+    if (it.sec){ html += `<li class="sec">${esc(it.sec)}</li>`; continue; }
+    html += rowHtml(it.sid, it.di, it.num); shown++;
+  }
+  $('list').innerHTML = html;
+  state.more = shown < total;
+  $('clear').hidden = !q;
+}
+
+/* ---------- detail ---------- */
+function weaknesses(types){
+  const gen = game.gen, out = {};
+  for (let a = 1; a <= 18; a++){
+    if (a === 18 && gen < 6) continue;
+    let m = 1;
+    for (const d of types){
+      let f = (CORE.eff[a] && CORE.eff[a][d] != null) ? CORE.eff[a][d] / 100 : 1;
+      if (gen < 6 && d === 9 && (a === 8 || a === 17)) f = .5;
+      m *= f;
+    }
+    if (m !== 1) (out[m] = out[m] || []).push(a);
+  }
+  return out;
+}
+function chainKids(sid){
+  const s = sp(sid);
+  return Object.keys(CORE.sp).map(Number).filter(c => CORE.sp[c][3] === s.chain && CORE.sp[c][4] === sid && G.existsSet.has(c) && sp(c).gen <= game.gen).sort((a,b) => a - b);
+}
+function chainRoot(sid){
+  let cur = sid, guard = 0;
+  while (guard++ < 5){ const f = sp(cur).frm; if (!f || !G.existsSet.has(f) || sp(f).gen > game.gen) break; cur = f; }
+  return cur;
+}
+function evoNode(sid, cur){
+  const s = sp(sid);
+  let html = `<button type="button" class="enode${sid === cur ? ' cur' : ''}" data-sid="${sid}">${thumb(sid)}<span><b>${esc(s.es)}</b></span></button>`;
+  const kids = chainKids(sid);
+  if (kids.length){
+    html += `<div class="ekids${kids.length > 1 ? ' branch' : ''}">` + kids.map(k => {
+      const how = (G.evo[k] || ['Método no disponible en este juego']).map(t => `<span>${esc(t)}</span>`).join(' ');
+      return `<div class="ehow">${how}</div>${evoNode(k, cur)}`;
+    }).join('') + `</div>`;
+  }
+  return html;
+}
+function openDetail(sid, push){
+  sid = +sid;
+  const s = sp(sid); if (!s) return;
+  state.sid = sid;
+  const types = typesFor(sid);
+  const dexNums = (G.inDex.get(sid) || []).map(([di, num]) => `${game.dex[di]} <span class="num">#${pad(num)}</span>`).join(' · ');
+  const leg = s.leg === 1 ? '<span class="badge">Legendario</span>' : s.leg === 2 ? '<span class="badge">Singular</span>' : '';
+  // evolution
+  const root = chainRoot(sid);
+  const hasChain = chainKids(root).length > 0;
+  const evoHtml = hasChain ? `<div class="evo">${evoNode(root, sid)}</div>` : `<p class="note">${esc(s.es)} no evoluciona en ${esc(game.n)}.</p>`;
+  // where
+  const av = G.avail[sid] || [];
+  const enc = G.enc[sid] || [];
+  let where = av.map(([lbl, txt]) => `<div class="wrow">${lbl ? `<span class="lbl">${esc(lbl)}</span>` : ''}${esc(txt)}</div>`).join('');
+  if (enc.length){
+    const li = enc.map((r, i) => `<li${i >= 6 ? ' data-extra hidden' : ''}><span class="p">${esc(r[0])}</span><span class="m">${esc(r[1])}${r[2] ? ' · ' + esc(r[2]) : ''}</span><span class="lv"><b class="num">Nv. ${r[3] === r[4] ? r[3] : r[3] + '–' + r[4]}</b>${r[5] ? r[5] + '%' : ''}</span></li>`).join('');
+    where += `<ul class="enc">${li}</ul>` + (enc.length > 6 ? `<button type="button" class="more" data-more>Ver los ${enc.length} lugares</button>` : '');
+  }
+  if (!where) where = `<p class="note">No hay datos de ubicación para ${esc(game.n)}.</p>`;
+  // weaknesses
+  const wk = weaknesses(types);
+  const order = [4, 2, .5, .25, 0];
+  const label = {4:'×4', 2:'×2', .5:'×½', .25:'×¼', 0:'×0'};
+  const wkHtml = order.filter(m => wk[m]).map(m => `<span class="x${m >= 2 ? ' hot' : ''}">${label[m]}</span><span class="chips" style="justify-content:flex-start">${wk[m].map(chip).join('')}</span>`).join('');
+  $('dTitle').textContent = s.es;
+  $('dBody').innerHTML = `
+    <div class="hero">${thumb(sid)}<div>
+      <h1 class="hname">${esc(s.es)}</h1>
+      <p class="hsub"><span class="num">Nº ${String(sid).padStart(4, '0')}</span>${norm(s.en) !== norm(s.es) ? ' · ' + esc(s.en) : ''}${leg}${dexNums ? '<br>' + dexNums : ''}</p>
+      <div class="chips" style="justify-content:flex-start">${types.map(chip).join('')}</div>
+    </div></div>
+    <section class="card"><h3>Evolución <small>en ${esc(game.n)}</small></h3>${evoHtml}</section>
+    <section class="card"><h3>Dónde encontrarlo <small>en ${esc(game.n)}</small></h3><div class="where">${where}</div></section>
+    <section class="card"><h3>Debilidades y resistencias</h3><div class="wk">${wkHtml}</div><p class="note">Daño que recibe según el tipo del ataque.</p></section>`;
+  const d = $('detail');
+  if (d.hidden){ d.hidden = false; document.body.style.overflow = 'hidden'; if (push !== false) pushSheet('detail'); }
+  d.scrollTop = 0;
+}
+function closeSheet(id){
+  const el = $(id); if (el.hidden) return;
+  el.hidden = true;
+  if ($('detail').hidden && $('picker').hidden) document.body.style.overflow = '';
+}
+
+/* ---------- game picker ---------- */
+function openPicker(){
+  const groups = {};
+  CORE.games.forEach(g => { (groups[PLATFORM[g.k]] = groups[PLATFORM[g.k]] || []).push(g); });
+  $('pBody').innerHTML = Object.entries(groups).map(([plat, gs]) => `
+    <div class="gplat">${esc(plat)}</div>
+    <div class="glist">${gs.map(g => `<button type="button" class="gopt" data-game="${g.k}" aria-current="${g.k === game.k}"><b>${esc(g.n)}</b><small>${esc(g.dex[0])}</small></button>`).join('')}</div>`).join('');
+  $('picker').hidden = false; document.body.style.overflow = 'hidden';
+  pushSheet('picker');
+}
+
+/* ---------- contests ---------- */
+const CONTEST = {
+  pokeblock: { item:'Pokécubos', verb:'Mezcla bayas en la Licuabayas para hacer pokécubos y dáselos a tu Pokémon para subir sus condiciones de concurso.' },
+  poffin: { item:'Pokochos', verb:'Cocina bayas para hacer pokochos y dáselos a tu Pokémon para subir sus condiciones de concurso.' },
+};
+const HALLS = {
+  emerald: 'Todos los rangos se compiten en la Sala de Concursos de Ciudad Calagua.',
+  'omega-ruby': 'Hay salas de concursos en Ciudad Portual, Pueblo Verdegal, Pueblo Pardal y Ciudad Calagua. En cualquiera puedes competir en cualquier rango.',
+  'alpha-sapphire': 'Hay salas de concursos en Ciudad Portual, Pueblo Verdegal, Pueblo Pardal y Ciudad Calagua. En cualquiera puedes competir en cualquier rango.',
+  platinum: 'Los Superconcursos se celebran en la Sala de Concursos de Ciudad Corazón.',
+};
+const RANKS = { pokeblock: ['Normal','Súper','Hiper','Máster'], poffin: ['Normal','Gran','Ultra','Máster'] };
+function berriesFor(){
+  const ids = game.k === 'emerald' ? b => (b.id <= 35 || (b.id >= 53 && b.id <= 60))
+            : game.k === 'platinum' ? b => b.id <= 64
+            : b => b.id <= 66 || b.id === 68;
+  return BER.berries.filter(ids);
+}
+function strongest(f){
+  const max = Math.max(...f); if (!max) return [];
+  return f.map((v, i) => v === max ? i : -1).filter(i => i >= 0);
+}
+async function renderContest(){
+  const v = $('viewContest');
+  if (!BER){
+    v.innerHTML = '<p class="empty"><strong>Cargando bayas…</strong></p>';
+    try { BER = await getJSON('berries.json'); } catch(e){ v.innerHTML = '<p class="empty"><strong>No se pudieron cargar las bayas</strong>Revisa tu conexión.</p>'; return; }
+  }
+  const C = CONTEST[game.contest], ranks = RANKS[game.contest];
+  const fl = BER.flavors;
+  let list = berriesFor();
+  if (state.berryFlavor >= 0) list = list.filter(b => b.f[state.berryFlavor] > 0).sort((a, b) => b.f[state.berryFlavor] - a.f[state.berryFlavor] || a.s - b.s);
+  const done = new Set(store.get('pk-rib-' + game.k, []));
+  v.innerHTML = `
+  <section class="card">
+    <h3>${C.item} en ${esc(game.n)}</h3>
+    <p class="note" style="color:var(--ink)">${C.verb} ${esc(HALLS[game.k] || '')}</p>
+    <ul class="flist">${fl.map(([f, cond, nat], i) => `<li class="frow"><span class="dot" style="background:${FLAV_COLOR[i]}"></span><div><b>${esc(f)} → ${esc(cond)}</b>${game.contest === 'pokeblock' ? ` <span>· pokécubo ${BLOCK_COLOR[i].toLowerCase()}</span>` : ''}<br><span>Le encanta a: ${esc(nat.join(', '))}</span></div></li>`).join('')}</ul>
+    <p class="note">Cada sabor sube una condición. Si la naturaleza de tu Pokémon ama ese sabor, sube más. La suavidad baja deja comer más ${C.item.toLowerCase()} antes de llenarse.</p>
+  </section>
+  <section class="card">
+    <h3>Bayas <small>${list.length} disponibles</small></h3>
+    <div class="ctabs" role="group" aria-label="Filtrar por sabor">
+      <button type="button" class="chip" data-flavor="-1" aria-pressed="${state.berryFlavor < 0}">Todas</button>
+      ${fl.map(([f], i) => `<button type="button" class="chip" data-flavor="${i}" aria-pressed="${state.berryFlavor === i}"><span class="dot" style="background:${FLAV_COLOR[i]}"></span>${esc(f)}</button>`).join('')}
+    </div>
+    <ul class="berries">${list.map(b => {
+      const top = strongest(b.f);
+      const res = top.length ? top.map(i => game.contest === 'pokeblock' ? 'Cubo ' + BLOCK_COLOR[i].toLowerCase() : fl[i][0]).join(' / ') : 'Sin sabor';
+      return `<li class="berry"><b>${esc(b.n)}</b><span class="res">${esc(res)}</span>
+        <div class="bars">${b.f.map((p, i) => `<span class="bar5">${esc(fl[i][0])} ${p}<i style="--w:${Math.min(100, p * 2.5)}%;--c:${FLAV_COLOR[i]}"></i></span>`).join('')}</div>
+        <span class="bmeta">Suavidad ${b.s} · ${esc(b.firm)}</span></li>`; }).join('')}</ul>
+  </section>
+  <section class="card">
+    <h3>Cintas de concurso <small>${done.size} de 20</small></h3>
+    <p class="note">Toca una cinta para marcarla como conseguida. Se guarda en este dispositivo.</p>
+    <div class="ribbons">${fl.map(([, cond], i) => `<div class="rcat"><b><span class="dot" style="background:${FLAV_COLOR[i]}"></span>${esc(cond)}</b><div class="rgrid">${ranks.map((r, j) => {
+      const id = i + '-' + j, on = done.has(id);
+      return `<label class="rib${on ? ' on' : ''}"><input type="checkbox" data-rib="${id}"${on ? ' checked' : ''}><span class="ico">✓</span>${esc(r)}</label>`; }).join('')}</div></div>`).join('')}</div>
+  </section>`;
+}
+function setTab(t){
+  state.tab = t;
+  document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
+  $('viewDex').hidden = t !== 'dex';
+  $('viewContest').hidden = t !== 'contest';
+  $('searchBox').hidden = t !== 'dex';
+  if (t === 'contest') renderContest();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const r = e.target.closest('[data-sid]'); if (r){ openDetail(r.dataset.sid, $('detail').hidden); return; }
+  const c = e.target.closest('[data-close]'); if (c){ history.state && history.state.sheet ? history.back() : closeSheet(c.dataset.close); return; }
+  const gb = e.target.closest('#gameBtn'); if (gb){ openPicker(); return; }
+  const go = e.target.closest('[data-game]'); if (go){ const k = go.dataset.game; history.state && history.state.sheet ? history.back() : closeSheet('picker'); state.q = ''; $('q').value = ''; loadGame(k); return; }
+  const tb = e.target.closest('[data-tab]'); if (tb){ setTab(tb.dataset.tab); return; }
+  const mo = e.target.closest('[data-more]'); if (mo){ mo.parentElement.querySelectorAll('[data-extra]').forEach(x => x.hidden = false); mo.remove(); return; }
+  const fb = e.target.closest('[data-flavor]'); if (fb){ state.berryFlavor = +fb.dataset.flavor; renderContest(); return; }
+  if (e.target.closest('#retry')) { loadGame(game.k); return; }
+});
+document.addEventListener('change', e => {
+  const cb = e.target.closest('[data-rib]'); if (!cb) return;
+  const key = 'pk-rib-' + game.k, set = new Set(store.get(key, []));
+  cb.checked ? set.add(cb.dataset.rib) : set.delete(cb.dataset.rib);
+  store.set(key, [...set]);
+  cb.parentElement.classList.toggle('on', cb.checked);
+  const h = cb.closest('.card').querySelector('h3 small'); if (h) h.textContent = `${set.size} de 20`;
+});
+window.addEventListener('popstate', () => { closeSheet('detail'); closeSheet('picker'); });
+let deb;
+$('q').addEventListener('input', e => { clearTimeout(deb); deb = setTimeout(() => { state.q = e.target.value; state.limit = 80; renderList(); window.scrollTo(0, 0); }, 80); });
+$('q').addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
+$('clear').addEventListener('click', () => { $('q').value = ''; state.q = ''; state.limit = 80; renderList(); $('q').focus(); });
+if ('IntersectionObserver' in window){
+  new IntersectionObserver(es => { if (es.some(x => x.isIntersecting) && state.more){ state.limit += 120; renderList(); } }, {rootMargin:'800px 0px'}).observe($('sentinel'));
+}
+
+/* ---------- start ---------- */
+(async function start(){
+  try { CORE = await getJSON('core.json'); }
+  catch(e){ $('list').innerHTML = '<li class="empty"><strong>No se pudieron cargar los datos</strong>Revisa tu conexión y recarga la página.</li>'; return; }
+  loadGame(store.get('pk-game', 'alpha-sapphire'));
+})();
+})();
+</script>
+<script>if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});</script>
+</body>
+</html>
